@@ -6,13 +6,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.net.URL;
+
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        URL resource = getClass().getClassLoader().getResource("UI/MainUI.fxml");
+        Parent root = FXMLLoader.load(resource);
+        primaryStage.setScene(new Scene(root));
+        primaryStage.setTitle("LZW");
         primaryStage.show();
     }
 

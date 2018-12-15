@@ -8,9 +8,6 @@ import java.nio.ByteBuffer;
 
 /**
  * A compressor that uses LZW coding to compress a set of bytes.
- *
- * @version 1.0 25 May 2016
- * @author Saul Johnson, Alex Mullen, Lee Oliver
  */
 public class LzwCompressor {
 
