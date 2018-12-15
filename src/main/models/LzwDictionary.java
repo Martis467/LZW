@@ -1,14 +1,15 @@
 package main.models;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
-/**
- * Represents a bidirectional mapping dictionary used for LZW compression.
- *
- * @version 1.0 25 May 2016
- * @author Saul Johnson, Alex Mullen, Lee Oliver
- */
+
 public class LzwDictionary {
+
+    private HashMap<String, Integer> dictionary = new HashMap<String, Integer>();
+    private DictionaryMode mode;
+    private int dictionaryMaxSize;
+    private int dictionaryCurrentSize;
 
     /** Maps hexadecimal strings to 16-bit data codes. */
     private final HashMap<String, Short> dataToCodes;
@@ -17,11 +18,35 @@ public class LzwDictionary {
     private final HashMap<Short, String> codesToData;
 
     /**
-     * Initialises a new instance of an LZW compression dictionary.
+     * Initialises a new default instance of an LZW compression dictionary.
      */
     public LzwDictionary() {
         dataToCodes = new HashMap<String, Short>();
         codesToData = new HashMap<Short, String>();
+        initializedDictionary();
+        initDictionary();
+    }
+
+    public LzwDictionary(int size, DictionaryMode mode)
+    {
+        this.dictionaryMaxSize = size;
+        this.mode = mode;
+        dataToCodes = new HashMap<String, Short>();
+        codesToData = new HashMap<Short, String>();
+        initializedDictionary();
+        initDictionary();
+    }
+
+    private void initializedDictionary() {
+        for (int i = 0; i < 256; i++)
+            addData(LzwUtils.toHex(i));
+    }
+
+    private void initDictionary() {
+        for (int i = 0; i < 256; i++) {
+            dictionary.put(String.valueOf((char) i), i);
+        }
+        dictionaryCurrentSize = 8;
     }
 
     /**
@@ -63,19 +88,67 @@ public class LzwDictionary {
         return codesToData.get(value);
     }
 
-    /**
-     * Gets the size of the dictionary.
-     * @return  the size of the dictionary
-     */
     public int getSize() {
-        return dataToCodes.size();
+        return dictionary.size();
+    }
+
+    public int getCurrentSize() {return dictionaryCurrentSize;}
+
+    public boolean isFull() {
+        if(dictionary.size() != dictionaryMaxSize) return false;
+        if(mode == DictionaryMode.Continue) return false;
+        return true;
     }
 
     /**
-     * Gets whether or not the dictionary is full.
-     * @return  true if the dictionary is full, otherwise false
+     * Adjusts dictionary based on the chosen mode
+     *  Infinite - Expands the dictionary by one bit
+     *  Clear - Empties the dictionary
+     *  Continue - Literally does nothing
      */
-    public boolean isFull() {
-        return dataToCodes.size() == Short.MAX_VALUE;
+    public void adjust() {
+        switch (mode)
+        {
+            case Infinite:
+            case Clear: dictionary.clear(); break;
+            case Continue: return;
+        }
+    }
+
+    public boolean hasSequence(String sq) {
+        return dictionary.containsKey(sq);
+    }
+
+    public DictionaryMode getMode() {
+        return mode;
+    }
+
+    public void addSequence(String sequence) {
+        dictionary.put(sequence, dictionary.size());
+    }
+
+    public String getEncodedBits(String sequence) {
+        int val = dictionary.get(sequence);
+        byte[] byteInt = ByteBuffer.allocate(4).putInt(val).array();
+        String bitString = LzwUtils.convertBitsToBitString(byteInt, byteInt.length);
+        return bitString.substring(bitString.length() - dictionaryCurrentSize);
+    }
+
+    /**
+     * Enum class for diffenret dictionary modes
+     */
+    public enum DictionaryMode
+    {
+        Infinite(0),
+        Clear(1),
+        Continue(2);
+
+        int value;
+        DictionaryMode(int value)
+        {
+            this.value = value;
+        }
+
+        public short getValue(){return (short)value;}
     }
 }
