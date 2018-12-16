@@ -26,14 +26,14 @@ public class Test {
         test.runAllTests();
     }
 
-    public void compareFilesWithGivenContent(String fileContent) throws IOException {
+    public void compareFilesWithGivenContent(String fileContent) throws IOException, URISyntaxException {
         FileOutputStream writer = new FileOutputStream(new File(file.getName()));
 
         writer.write(fileContent.getBytes());
         writer.close();
 
         encoder.encode();
-        decoder.decode(encodedFile.toString(), decodedFile.toString());
+        decoder.decode(encodedFile.toURL(), decodedFile.toURL());
         byte[] f1 = Files.readAllBytes(file.toPath());
         byte[] f2 = Files.readAllBytes(decodedFile.toPath());
 

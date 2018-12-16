@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import main.models.Decode;
 import main.models.Encode;
 import main.models.LzwUtils;
 
@@ -108,14 +109,16 @@ public class MainUI implements Initializable {
         }
         LzwUtils.DictionaryMode mode = getMode();
         Encode encoder = new Encode(compressionFilePathUrl, Integer.parseInt(dictionarySize.getText()), mode);
+        encoder.encode();
 
-        long encodedFileSize = encoder.getInputFileSize();
+        long encodedFileSize = encoder.getOutputFilesize();
         compressorEncoded.setText(String.valueOf(encodedFileSize));
         compressorEncoded.setVisible(true);
 
         long fileSize = Long.parseLong(compressorFile.getText());
         compressorComparison.setText(String.valueOf(df.format((float)fileSize/encodedFileSize)));
         compressorComparison.setVisible(true);
+
     }
 
     private LzwUtils.DictionaryMode getMode() {
@@ -141,7 +144,7 @@ public class MainUI implements Initializable {
         }
     }
 
-    public void decompressFile(ActionEvent actionEvent) {
+    public void decompressFile(ActionEvent actionEvent) throws URISyntaxException, MalformedURLException {
         if(decompressorFilePathText.getText().isEmpty())
         {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -150,6 +153,19 @@ public class MainUI implements Initializable {
             alert.showAndWait();
             return;
         }
+
+        Decode decoder = new Decode();
+        URL decompressedFileOutputUrl =new URL(decompressionFilePathUrl.toString().replace(".Encoded", ".decoded"));
+        decoder.decode(decompressionFilePathUrl, decompressedFileOutputUrl);
+
+        long decodedFileSize = decoder.getOutputFilesize();
+        decompressorDecoded.setText(String.valueOf(decodedFileSize));
+        decompressorDecoded.setVisible(true);
+
+        long fileSize = Long.parseLong(decompressorFile.getText());
+        decompressorComparison.setText(String.valueOf(df.format((float)fileSize/decodedFileSize)));
+        decompressorComparison.setVisible(true);
+
     }
 
     private File choosePath()

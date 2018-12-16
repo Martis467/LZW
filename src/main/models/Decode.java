@@ -3,6 +3,8 @@ package main.models;
 import main.models.LzwUtils;
 
 import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 
 public class Decode {
@@ -14,7 +16,9 @@ public class Decode {
     private int currentNumberLen;
     private LzwUtils.DictionaryMode dictionaryMode;   // 0 - grow infinite, 1 - clear, 2 - full and keep using full
     private boolean fullAndDontAddIt = false;
-
+    //Variables for UI
+    private File inputFile;
+    private File outputFile;
     public Decode() {}
 
     public void resetDefaults(){
@@ -24,12 +28,14 @@ public class Decode {
         fullAndDontAddIt = false;
     }
 
-    public void decode(String fileToDecode, String outputFile) {
+    public void decode(URL fileToDecode, URL outputFileUrl) throws URISyntaxException {
+        this.inputFile = new File(fileToDecode.toURI());
+        this.outputFile = new File(outputFileUrl.toURI());
+
         resetDefaults();
-        File file = new File(fileToDecode);
         initDictionary();
-        try (FileInputStream fs = new FileInputStream(file)) {
-            FileOutputStream out = new FileOutputStream(new File(outputFile));
+        try (FileInputStream fs = new FileInputStream(inputFile)) {
+            FileOutputStream out = new FileOutputStream(outputFile);
             DataOutputStream outputStream = new DataOutputStream(out);
 
             int readByte = fs.read();
@@ -115,4 +121,6 @@ public class Decode {
     private String convertBitsToBitString(byte byteBuffer) {
         return String.format("%8s", Integer.toBinaryString(byteBuffer & 0xFF)).replace(' ', '0');
     }
+    public long getInputFileSize(){return inputFile.length();}
+    public long getOutputFilesize(){return outputFile.length();}
 }
