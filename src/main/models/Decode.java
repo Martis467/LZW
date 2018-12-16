@@ -71,7 +71,7 @@ public class Decode {
     }
 
     private void checkDictionary() {
-        if (dictionary.size() == maxDictSize) {
+        if (dictionary.size() == maxDictSize - 1) {
 
             if (dictionaryMode == LzwUtils.DictionaryMode.Infinite) {
                 //increase size and word len

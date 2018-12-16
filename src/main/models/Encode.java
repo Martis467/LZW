@@ -25,10 +25,10 @@ public class Encode {
         this.inputFile = new File(filePathUrl.toURI());
         this.outputFile = new File(inputFile.getName() + ".Encoded");
         this.dictionaryMode = dictionaryMode;
-        if (dictionaryMode != LzwUtils.DictionaryMode.Infinite)
-            this.maxNumberLen = maxNumberLen;
-        else
+        if (dictionaryMode == LzwUtils.DictionaryMode.Infinite)
             this.maxNumberLen = 63; // just a big number
+        else
+            this.maxNumberLen = maxNumberLen;
 
         maxDictSize = (int) Math.pow(2.0, (float) this.maxNumberLen);
         currentNumberLen = maxNumberLen == 8 ? 8 : 9;
@@ -91,7 +91,7 @@ public class Encode {
 
     private void checkDictionary() {
         //check whether max size reached
-        if (dictionary.size() == maxDictSize) {
+        if (dictionary.size() == maxDictSize - 1) {
 
             if (dictionaryMode == LzwUtils.DictionaryMode.Infinite) {
                 maxNumberLen++;

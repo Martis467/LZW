@@ -40,7 +40,7 @@ public class Test {
         if(!Arrays.equals(f1, f2))
         {
           System.out.println("failed");
-         // throw new IOException();
+            System.exit(-1);
         }
         //assert (Arrays.equals(f1, f2));
     }
@@ -48,7 +48,7 @@ public class Test {
     public void runAllTests() {
 
         for(LzwUtils.DictionaryMode dictMode : LzwUtils.DictionaryMode.values()){
-            for(int maxNumLen = 9; maxNumLen< 26; ++maxNumLen){
+            for(int maxNumLen = 8; maxNumLen< 30; ++maxNumLen){
                 runTestCases(maxNumLen, dictMode);
             }
         }
@@ -70,7 +70,7 @@ public class Test {
             compareFilesWithGivenContent("THIS IS TEST STRING THIS IS TEST STRING THIS IS TEST STRING THIS IS TEST STRING THIS IS TEST STRING ");
             compareFilesWithGivenContent("TOBEORNOTTOBEORTOBEORNOT");
 
-            int len = 5000;
+            int len = 10000;
             StringBuilder longString = new StringBuilder(len);
             for(int i = 0; i < len; i++)
                 longString.append((char)i);
