@@ -15,20 +15,13 @@ public class Decode {
     private LzwUtils.DictionaryMode dictionaryMode;   // 0 - grow infinite, 1 - clear, 2 - full and keep using full
     private boolean fullAndDontAddIt = false;
 
-    public Decode(int maxNumberLen) {
-        this.maxNumberLen = maxNumberLen;
-        this.dictionaryMode = LzwUtils.DictionaryMode.Clear;
-        maxDictSize =(int) Math.pow(2.0,(float) this.maxNumberLen);
-        currentNumberLen = maxNumberLen == 8 ? 8 : 9;
-    }
+    public Decode() {}
 
     public void resetDefaults(){
         dictionary = new HashMap<>();
         sequence = "";
         encodedString = "";
         fullAndDontAddIt = false;
-        maxDictSize =(int) Math.pow(2.0,(float) maxNumberLen);
-        currentNumberLen = maxNumberLen == 8 ? 8 : 9;
     }
 
     public void decode(String fileToDecode, String outputFile) {
@@ -38,8 +31,10 @@ public class Decode {
         try (FileInputStream fs = new FileInputStream(file)) {
             FileOutputStream out = new FileOutputStream(new File(outputFile));
             DataOutputStream outputStream = new DataOutputStream(out);
+
             int readByte = fs.read();
-            dictionaryMode = LzwUtils.DictionaryMode.fromDictionaryValue(readByte);
+            getMetaDataFromFirstByte(readByte);
+
             while (-1 != (readByte = fs.read())) {
                 encodedString += convertBitsToBitString ((byte)readByte);
                 if (encodedString.length() < currentNumberLen)
@@ -62,8 +57,15 @@ public class Decode {
         }
     }
 
+    private void getMetaDataFromFirstByte (int firstByte){
+        dictionaryMode = LzwUtils.DictionaryMode.fromDictionaryValue((firstByte & 0xC0)>>6);
+        maxNumberLen = firstByte & 0x3F; // if infinite mode, it should be 63 written in
+        currentNumberLen = maxNumberLen == 8 ? 8 : 9;
+        maxDictSize =(int) Math.pow(2.0,(float) maxNumberLen);
+    }
+
     private void checkDictionary() {
-        if (dictionary.size() == maxDictSize-1) {
+        if (dictionary.size() == maxDictSize) {
 
             if (dictionaryMode == LzwUtils.DictionaryMode.Infinite) {
                 //increase size and word len

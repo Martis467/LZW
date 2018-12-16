@@ -22,10 +22,14 @@ public class Encode {
 
 
     public Encode(URL filePathUrl, int maxNumberLen, LzwUtils.DictionaryMode dictionaryMode) throws URISyntaxException {
-        this.maxNumberLen = maxNumberLen;
-        this.dictionaryMode = dictionaryMode;
         this.inputFile = new File(filePathUrl.toURI());
         this.outputFile = new File(inputFile.getName() + ".Encoded");
+        this.dictionaryMode = dictionaryMode;
+        if (dictionaryMode != LzwUtils.DictionaryMode.Infinite)
+            this.maxNumberLen = maxNumberLen;
+        else
+            this.maxNumberLen = 63; // just a big number
+
         maxDictSize = (int) Math.pow(2.0, (float) this.maxNumberLen);
         currentNumberLen = maxNumberLen == 8 ? 8 : 9;
     }
@@ -46,7 +50,9 @@ public class Encode {
             DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(outputFile));
             //save dictionary mode since we will need it while decoding
 
-            outputStream.writeByte((byte)dictionaryMode.getValue());
+            byte metaData = (byte)(dictionaryMode.getValue()<<6);
+            metaData |= maxNumberLen;
+            outputStream.writeByte(metaData);
 
             int readByte = 0;
             while (-1 != (readByte = fs.read())) {
@@ -125,7 +131,6 @@ public class Encode {
             // Start the sequence afresh with the new byte string.
             sequence = currentByte;
         }
-
     }
 
     private void writeDataToOutput(DataOutputStream outputStream) throws IOException {

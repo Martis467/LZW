@@ -5,6 +5,9 @@ import main.models.Encode;
 import main.models.LzwUtils;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.Arrays;
 
@@ -16,12 +19,12 @@ public class Test {
     private File encodedFile = new File("testFile.txt.encoded");
     private File decodedFile = new File("testFileDecoded.txt");
 
-    public Test()
-    {
-     //encoder = new Encode(9, LzwUtils.DictionaryMode.Clear);
-    // decoder = new Decode(8);
-    }
+    public Test() {}
 
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        Test test = new Test();
+        test.runAllTests();
+    }
 
     public void compareFilesWithGivenContent(String fileContent) throws IOException {
         FileOutputStream writer = new FileOutputStream(new File(file.getName()));
@@ -42,8 +45,20 @@ public class Test {
         //assert (Arrays.equals(f1, f2));
     }
 
-    public void runAllTests(){
+    public void runAllTests() {
+
+        for(LzwUtils.DictionaryMode dictMode : LzwUtils.DictionaryMode.values()){
+            for(int maxNumLen = 9; maxNumLen< 26; ++maxNumLen){
+                runTestCases(maxNumLen, dictMode);
+            }
+        }
+
+    }
+
+    private void runTestCases(int maxNumberLen, LzwUtils.DictionaryMode mode){
         try {
+            encoder = new Encode(file.toURL(),maxNumberLen, mode);
+            decoder = new Decode();
             compareFilesWithGivenContent("asd\0eeesf");
             compareFilesWithGivenContent("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab");
             compareFilesWithGivenContent("THIS IS TEST STRING agajgnadjkfnejwafgeg THIS IS TEST STRING agajgnadjkfnejwafgeg THIS IS TEST STRING agajgnadjkfnejwafgeg THIS IS TEST STRING agajgnadjkfnejwafgeg");
@@ -53,11 +68,9 @@ public class Test {
             compareFilesWithGivenContent("ab");
             compareFilesWithGivenContent("afsf");
             compareFilesWithGivenContent("THIS IS TEST STRING THIS IS TEST STRING THIS IS TEST STRING THIS IS TEST STRING THIS IS TEST STRING ");
-
-
             compareFilesWithGivenContent("TOBEORNOTTOBEORTOBEORNOT");
 
-            int len = 15000;
+            int len = 5000;
             StringBuilder longString = new StringBuilder(len);
             for(int i = 0; i < len; i++)
                 longString.append((char)i);
@@ -71,6 +84,8 @@ public class Test {
         }catch (IOException e)
         {
 
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
     }
 
