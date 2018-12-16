@@ -99,7 +99,9 @@ public class MainUI implements Initializable {
     }
 
     public void compressFile(ActionEvent actionEvent) throws URISyntaxException {
-        if(compressorFilePathText.getText().isEmpty() || dictionarySize.getText().isEmpty() || dictionaryTypeSelector.getValue() == null)
+        if(compressorFilePathText.getText().isEmpty() ||
+                dictionarySize.getText().isEmpty() ||
+                (dictionaryTypeSelector.getValue() == null && !dictionarySize.getText().equals("0")))
         {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(null);
