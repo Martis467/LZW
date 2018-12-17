@@ -9,21 +9,24 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Test {
 
+    private final String sliosas = "-----------------------------------------------------------------------------------------";
     private Encode encoder;
     private Decode decoder;
     private File file = new File("testFile.txt");
     private File encodedFile = new File("testFile.txt.encoded");
     private File decodedFile = new File("testFileDecoded.txt");
-
+    private final String path = "resources/";
+    private ArrayList<File> testfileArr;
     public Test() {}
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         Test test = new Test();
-        test.runAllTests();
+        test.extendedTests();
     }
 
     public void compareFilesWithGivenContent(String fileContent) throws IOException, URISyntaxException {
@@ -89,4 +92,70 @@ public class Test {
         }
     }
 
+    public void extendedTests()
+    {
+        testfileArr = new ArrayList<>();
+        testfileArr.add(new File(path + "AltoriuSeseli.pdf"));
+        testfileArr.add(new File(path + "Dot.bmp"));
+        testfileArr.add(new File(path + "Dot.png"));
+        testfileArr.add(new File(path + "Dot.jpg"));
+        testfileArr.add(new File(path + "cardano"));
+        testfileArr.add(new File(path + "cardano.exe"));
+
+        System.out.println("----------------------------START--------------------------------");
+        testfileArr.forEach(f -> {
+            try {
+                System.out.println("File being compressed: " + f.getName());
+                System.out.println("Infinite size");
+                //Meassuring time
+                long startTime = System.nanoTime();
+                encoder = new Encode(f.toURI().toURL(), 0, LzwUtils.DictionaryMode.Infinite);
+                encoder.encode();
+                long endTime = System.nanoTime();
+
+                //Printing results
+                System.out.println("File size: " + encoder.getInputFileSize() + " Compressed size: " + encoder.getOutputFilesize()
+                + System.lineSeparator() + "Compression Coefficient: " + (float)encoder.getInputFileSize()/encoder.getOutputFilesize());
+
+                System.out.println("Duration : " + (endTime - startTime));
+                System.out.println(System.lineSeparator());
+                encoder.deleteOutputFile();
+
+
+                System.out.println("15 size with no clear");
+                startTime = System.nanoTime();
+                encoder = new Encode(f.toURI().toURL(), 15, LzwUtils.DictionaryMode.Continue);
+                encoder.encode();
+                endTime = System.nanoTime();
+
+                //Printing results
+                System.out.println("File size: " + encoder.getInputFileSize() + " Compressed size: " + encoder.getOutputFilesize()
+                        + System.lineSeparator() + "Compression Coefficient: " + (float)encoder.getInputFileSize()/encoder.getOutputFilesize());
+
+                System.out.println("Duration : " + (endTime - startTime));
+                System.out.println(System.lineSeparator());
+                encoder.deleteOutputFile();
+
+
+                System.out.println("15 size with clear");
+                startTime = System.nanoTime();
+                encoder = new Encode(f.toURI().toURL(), 15, LzwUtils.DictionaryMode.Clear);
+                encoder.encode();
+                endTime = System.nanoTime();
+
+                //Printing results
+                System.out.println("File size: " + encoder.getInputFileSize() + " Compressed size: " + encoder.getOutputFilesize()
+                        + System.lineSeparator() + "Compression Coefficient: " + (float)encoder.getInputFileSize()/encoder.getOutputFilesize());
+
+                System.out.println("Duration : " + (endTime - startTime));
+                encoder.deleteOutputFile();
+                System.out.println(sliosas);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
 }

@@ -34,6 +34,7 @@ public class Encode {
         currentNumberLen = maxNumberLen == 8 ? 8 : 9;
     }
 
+
     public void resetDefaults() {
         dictionary = new HashMap<>();
         sequence = "";
@@ -161,4 +162,6 @@ public class Encode {
 
     public long getInputFileSize(){return inputFile.length();}
     public long getOutputFilesize(){return outputFile.length();}
+    public void deleteOutputFile() {outputFile.delete();}
+
 }
