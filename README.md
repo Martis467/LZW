@@ -4,6 +4,8 @@
 
 <h5>To do list:</h5>
 
-- [ ] Change file reading - to read file in buffers
-- [ ] Adjust dictionary construction - currently the dictionary is constant(16bits) we need to make it variable in length
-- [ ] Create a simple UI
+- [x] Change file reading - to read file in buffers
+- [x] Adjust dictionary construction - currently the dictionary is constant(16bits) we need to make it variable in length
+- [x] Create a simple UI
+
+<h5>Done</h5>
